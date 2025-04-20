@@ -3,11 +3,8 @@ PATH=/bin:/usr/bin ; export PATH
 umask 022
 
 # ------comment section -------------
-# Assignment number - 09
-# Name : Nibir Nandi Dibbo , Student number : 041124380
-# Course number : CST8102, Lab section : CST8102 312
+# Name : Nibir Nandi Dibbo
 # Script file name : manage_users
-# Submission date : 2 April 2025
 #---------------------------Functionality/Pseudocode----------------------------
 # Functionality: This script provides a menu-driven interface to manage user accounts on a Linux system.
 # All functions asks for user input using read -p command and then performs designated tasks - 1) adding new user using useradd -c comment -d directory -m making directory -s shell username command. 2) changing initial group using usermod -g initial_group username command 3) adding supplementary group by adding group first (groupadd groupname ) then assigning it to user using usermod -a (append) -G groupname. 4) changing shell by command , usermod -s shellname 5)Changing expiration date by usermod -e expiration_date(YYYY-MM-DD) 5)finally deleting user by userldel -r(with home directory) username , command.
@@ -28,7 +25,7 @@ add_user() {
     read -p "Enter user's home directory (absolute path) : " home_dir
     read -p "Enter default login shell (absolute path) : " shell
 	
-    #Extra : checking if user already exists, 1) checking the username inside /etc/passwd using fgrep command with error suppression(2>/dev/null). 2)If useradd command is successful then username is granted and proceeded for setting password with sudo passwd username, else error is shown in stderr stream (echo 1>&2 "(error message)")
+    #checking if user already exists, 1) checking the username inside /etc/passwd using fgrep command with error suppression(2>/dev/null). 2)If useradd command is successful then username is granted and proceeded for setting password with sudo passwd username, else error is shown in stderr stream (echo 1>&2 "(error message)")
 	
     pattern="${user_name}:"
     if sudo fgrep "${pattern}" /etc/passwd 2>/dev/null ; then 
@@ -37,7 +34,7 @@ add_user() {
     elif sudo useradd -c "${user_name}" -d "${home_dir}" -m -s "${shell}" "${user_name}" ; then 
 	    echo "Username, '${user_name}'  is granted!"
  	     
-	     #Extra: if username is granted sudo passwd prompts user for user input for password, if it fails, it immediately shows error in stderr stream and deletes the granted username with it's home directory using userdel -r command.
+	     #if username is granted sudo passwd prompts user for user input for password, if it fails, it immediately shows error in stderr stream and deletes the granted username with it's home directory using userdel -r command.
 
 	    echo "Setting password for username, '${user_name}'"
 	    if sudo passwd "${user_name}" ; then 
@@ -55,7 +52,7 @@ add_user() {
 
 change_initial_group() {
     read -p "Enter username : " user_name
-    #Extra : to show what user's current initial group before changing. id -Gn  username shows all the groups assigned to an user, sending that output using | first fields is the initial group, extracting that using cut command where delimiter is space (" "),else clause says, username doesnot exists, cause each user much need a initial group. keeping the whole command inside if block else showing error in stderr.
+    #to show what user's current initial group before changing. id -Gn  username shows all the groups assigned to an user, sending that output using | first fields is the initial group, extracting that using cut command where delimiter is space (" "),else clause says, username doesnot exists, cause each user much need a initial group. keeping the whole command inside if block else showing error in stderr.
 
     if  current_initial_grp=$(id -Gn "${user_name}" | cut -d " " -f1); then
            echo "User, ${user_name}'s current initial group name: ${current_initial_grp}  "
@@ -76,7 +73,7 @@ change_initial_group() {
 change_supplementary_group() {
     
     read -p "Enter username : " user_name
-    #Extra : same way as before , showing the current supplementary group where cut command extract the second field from id -Gn command. if this command fails then supplementary group return an non empty string which checked using -n in test command (elif command).***since -f2- sends only primary group name when there is no supplementary group, (to solve this) using wc -w gives value of 1, it means username doesnot have supplementary group rather just a primary group (if clause).
+    # same way as before , showing the current supplementary group where cut command extract the second field from id -Gn command. if this command fails then supplementary group return an non empty string which checked using -n in test command (elif command).***since -f2- sends only primary group name when there is no supplementary group, (to solve this) using wc -w gives value of 1, it means username doesnot have supplementary group rather just a primary group (if clause).
 	
     current_sup_grp=$(id -Gn "${user_name}" | cut -d " " -f2-)
     
@@ -105,7 +102,7 @@ change_supplementary_group() {
 change_shell() {
     read -p "Enter username : " user_name
     
- #Extra:if username exists showing current login shell if it exists, using fgrep command with pattern to find out designated userinfo line for /etc/passwd file and extracting field 7 for the line which is the value of shell. here each field is separated by delimiter so cut -d : is used 
+ #if username exists showing current login shell if it exists, using fgrep command with pattern to find out designated userinfo line for /etc/passwd file and extracting field 7 for the line which is the value of shell. here each field is separated by delimiter so cut -d : is used 
 
     pattern="${user_name}:"	
     
